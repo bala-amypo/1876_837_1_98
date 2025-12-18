@@ -3,6 +3,7 @@ package com.example.demo.model;
 import lombok.*;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.List; // ✅ FIXED: Import added
 
 @Entity
 @Table(name = "micro_lessons")

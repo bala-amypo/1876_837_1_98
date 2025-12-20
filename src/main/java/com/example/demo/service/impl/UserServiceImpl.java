@@ -1,9 +1,9 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.User;                  // your User entity
-import com.example.demo.repository.UserRepository;  // your UserRepository
-import com.example.demo.service.UserService;        // your UserService interface
-import org.springframework.beans.factory.annotation.Autowired; 
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,5 +26,9 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
-    // other methods from UserService
+    @Override
+    public User saveUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
 }

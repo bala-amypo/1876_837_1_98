@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -23,17 +24,17 @@ public class Recommendation {
 
     private LocalDateTime generatedAt;
 
-    @Column(nullable = false, length = 1000)
-    private String recommendedLessonIds;
-
-    @Column(length = 2000)
-    private String basisSnapshot;
-
-    @Column(nullable = false, precision = 3, scale = 2)
-    private BigDecimal confidenceScore;
-
     @PrePersist
-    public void onCreate() {
+    public void prePersist() {
         this.generatedAt = LocalDateTime.now();
     }
+
+    @Column(length = 1000, nullable = false)
+    private String recommendedLessonIds; // comma-separated
+
+    @Column(length = 2000)
+    private String basisSnapshot; // JSON text
+
+    @Column(precision = 3, scale = 2)
+    private BigDecimal confidenceScore;
 }

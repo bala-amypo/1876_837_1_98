@@ -2,6 +2,7 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -21,23 +22,22 @@ public class MicroLesson {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
     private Integer durationMinutes;
 
-    @Column(nullable = false, length = 50)
-    private String contentType;  // VIDEO, TEXT, etc.
+    @Column(nullable = false)
+    private String contentType; // VIDEO / TEXT / QUIZ / etc.
 
-    @Column(nullable = false, length = 50)
-    private String difficulty;   // BEGINNER, INTERMEDIATE, ADVANCED
+    @Column(nullable = false)
+    private String difficulty; // BEGINNER / INTERMEDIATE / ADVANCED
 
-    @Column(length = 500)
-    private String tags;         // Comma-separated tags
+    private String tags; // comma-separated
 
     private LocalDate publishDate;
 
-    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Progress> progresses;
+    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL)
+    private List<Progress> progressRecords;
 }

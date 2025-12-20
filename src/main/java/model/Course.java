@@ -6,11 +6,10 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table(name = "courses")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Course {
 
     @Id
@@ -21,10 +20,12 @@ public class Course {
 
     private String description;
 
+    private String category;   // ← Add this
+
     @ManyToOne
     @JoinColumn(name = "instructor_id")
     private User instructor;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-    private List<Progress> progressRecords;
+    private List<MicroLesson> lessons;
 }

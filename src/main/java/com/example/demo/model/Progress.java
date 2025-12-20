@@ -1,6 +1,13 @@
+package com.example.demo.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "progress",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","micro_lesson_id"}))
+@Table(name = "progress")
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,20 +19,15 @@ public class Progress {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name="micro_lesson_id")
-    private MicroLesson microLesson;
+    private BigDecimal completion;
 
-    private String status;
-    private Integer progressPercent;
-    private BigDecimal score;
-    private LocalDateTime lastAccessedAt;
+    private LocalDateTime updatedAt;
 
     @PrePersist
-    void init() {
-        lastAccessedAt = LocalDateTime.now();
+    @PreUpdate
+    void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

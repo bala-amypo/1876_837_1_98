@@ -1,5 +1,13 @@
+package com.example.demo.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name="recommendations")
+@Table(name = "recommendations")
 @Data
 @Builder
 @NoArgsConstructor
@@ -11,21 +19,16 @@ public class Recommendation {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
     private User user;
 
-    private LocalDateTime generatedAt;
-
-    @Column(length = 500)
     private String recommendedLessonIds;
-
-    @Column(length = 1000)
-    private String basisSnapshot;
 
     private BigDecimal confidenceScore;
 
+    private LocalDateTime generatedAt;
+
     @PrePersist
-    void generated() {
+    void onCreate() {
         generatedAt = LocalDateTime.now();
     }
 }

@@ -3,7 +3,6 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -18,24 +17,14 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String title;
 
     private String description;
 
-    private String category;
-
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "instructor_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "instructor_id")
     private User instructor;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-    private List<MicroLesson> lessons;
+    private List<Progress> progressRecords;
 }

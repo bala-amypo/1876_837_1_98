@@ -3,12 +3,8 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 @Entity
-@Table(name = "progress",
-       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "micro_lesson_id"}))
+@Table(name = "progress")
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,26 +15,13 @@ public class Progress {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    private int completedPercentage;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "micro_lesson_id", nullable = false)
-    private MicroLesson microLesson;
-
-    @Column(nullable = false)
-    private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
-
-    @Column(nullable = false)
-    private Integer progressPercent; // 0–100
-
-    private BigDecimal score;
-
-    private LocalDateTime lastAccessedAt;
-
-    @PrePersist
-    public void prePersist() {
-        this.lastAccessedAt = LocalDateTime.now();
-    }
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    private Course course;
 }

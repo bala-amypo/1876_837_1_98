@@ -1,13 +1,10 @@
-package com.example.demo.model;
-
-import jakarta.persistence.*;
-import lombok.*;
-
 @Entity
+@Table(name = "progress",
+       uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","micro_lesson_id"}))
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Progress {
 
     @Id
@@ -15,17 +12,20 @@ public class Progress {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name="user_id")
     private User user;
 
     @ManyToOne
-    private Course course;
-
-    @ManyToOne
+    @JoinColumn(name="micro_lesson_id")
     private MicroLesson microLesson;
 
-    private int progressPercent;
-
     private String status;
+    private Integer progressPercent;
+    private BigDecimal score;
+    private LocalDateTime lastAccessedAt;
 
-    private int score;
+    @PrePersist
+    void init() {
+        lastAccessedAt = LocalDateTime.now();
+    }
 }

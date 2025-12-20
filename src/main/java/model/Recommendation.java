@@ -1,14 +1,9 @@
-package com.example.demo.model;
-
-import jakarta.persistence.*;
-import lombok.*;
-import java.util.List;
-
 @Entity
+@Table(name="recommendations")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Recommendation {
 
     @Id
@@ -16,8 +11,21 @@ public class Recommendation {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name="user_id")
     private User user;
 
-    @ElementCollection
-    private List<Long> recommendedLessonIds;  // ← Add this
+    private LocalDateTime generatedAt;
+
+    @Column(length = 500)
+    private String recommendedLessonIds;
+
+    @Column(length = 1000)
+    private String basisSnapshot;
+
+    private BigDecimal confidenceScore;
+
+    @PrePersist
+    void generated() {
+        generatedAt = LocalDateTime.now();
+    }
 }

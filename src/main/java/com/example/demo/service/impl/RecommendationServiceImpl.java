@@ -1,62 +1,38 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.RecommendationRequest;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.*;
-import com.example.demo.repository.*;
+import com.example.demo.model.Recommendation;
+import com.example.demo.repository.RecommendationRepository;
 import com.example.demo.service.RecommendationService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 @Service
-@RequiredArgsConstructor
 public class RecommendationServiceImpl implements RecommendationService {
 
-    private final RecommendationRepository recommendationRepository;
-    private final UserRepository userRepository;
-    private final MicroLessonRepository lessonRepository;
-    private final ProgressRepository progressRepository;
+    @Autowired
+    private RecommendationRepository recommendationRepository;
 
     @Override
-    public Recommendation generateRecommendation(Long userId, RecommendationRequest params) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        List<MicroLesson> lessons = lessonRepository.findByTagsContainingAndDifficultyAndContentType(
-                params.getTags(), params.getDifficulty(), params.getContentType());
-
-        String recommendedIds = lessons.stream()
-                .limit(params.getLimit() == null ? 5 : params.getLimit())
-                .map(l -> String.valueOf(l.getId()))
-                .collect(Collectors.joining(","));
-
-        Recommendation rec = Recommendation.builder()
-                .user(user)
-                .recommendedLessonIds(recommendedIds)
-                .basisSnapshot("Generated based on filters and progress")
-                .confidenceScore(BigDecimal.valueOf(Math.random()))
-                .build();
-
-        return recommendationRepository.save(rec);
+    public List<Long> getRecommendedLessonIds(String lessonIdsCsv) {
+        // Convert comma-separated String to List<Long>
+        return Arrays.stream(lessonIdsCsv.split(","))
+                     .map(String::trim)
+                     .map(Long::parseLong)
+                     .collect(Collectors.toList());
     }
 
     @Override
-    public Recommendation getLatestRecommendation(Long userId) {
-        List<Recommendation> list = recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId);
-        if (list.isEmpty()) throw new ResourceNotFoundException("No recommendations found");
-        return list.get(0);
+    public Recommendation saveRecommendation(Recommendation recommendation) {
+        return recommendationRepository.save(recommendation);
     }
 
     @Override
-    public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
-        LocalDateTime start = from.atStartOfDay();
-        LocalDateTime end = to.atTime(23, 59);
-        return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
+    public List<Recommendation> getAllRecommendations() {
+        return recommendationRepository.findAll();
     }
 }

@@ -33,7 +33,7 @@ public class RecommendationServiceImpl implements RecommendationService {
         Recommendation recommendation = Recommendation.builder()
                 .generatedAt(LocalDateTime.now())
                 .basisSnapshot(basisSnapshot)
-                .confidenceScore(BigDecimal.valueOf(confidenceScore)) // ✅ Fix double→BigDecimal
+                .confidenceScore(BigDecimal.valueOf(confidenceScore))
                 .user(user)
                 .build();
 
@@ -41,13 +41,13 @@ public class RecommendationServiceImpl implements RecommendationService {
     }
 
     @Override
-    public Recommendation getLatestRecommendation(Long userId) {
+    public Recommendation getLatest(Long userId) {
         return repository.findTopByUserIdOrderByGeneratedAtDesc(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("No recommendations found"));
     }
 
     @Override
-    public List<Recommendation> getUserRecommendations(Long userId) {
+    public List<Recommendation> getByUser(Long userId) {
         return repository.findByUserId(userId);
     }
 }

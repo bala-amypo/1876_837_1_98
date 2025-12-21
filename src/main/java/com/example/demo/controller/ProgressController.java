@@ -1,9 +1,3 @@
-package com.example.demo.controller;
-
-import com.example.demo.model.Progress;
-import com.example.demo.service.ProgressService;
-import org.springframework.web.bind.annotation.*;
-
 @RestController
 @RequestMapping("/progress")
 public class ProgressController {
@@ -14,19 +8,20 @@ public class ProgressController {
         this.service = service;
     }
 
-    // ✅ POST – record or update progress
     @PostMapping("/{lessonId}")
-    public Progress saveProgress(
+    public Progress save(
             @PathVariable Long lessonId,
             @RequestBody Progress progress) {
         return service.saveProgress(lessonId, progress);
     }
 
-    // ✅ GET – get user progress for lesson
-    @GetMapping("/lesson/{lessonId}/user/{userId}")
-    public Progress getProgress(
-            @PathVariable Long lessonId,
-            @PathVariable Long userId) {
-        return service.getProgress(lessonId, userId);
+    @GetMapping("/user/{userId}")
+    public List<Progress> userProgress(@PathVariable Long userId) {
+        return service.getUserProgress(userId);
+    }
+
+    @GetMapping("/lesson/{lessonId}")
+    public Progress lessonProgress(@PathVariable Long lessonId) {
+        return service.getLessonProgress(lessonId);
     }
 }

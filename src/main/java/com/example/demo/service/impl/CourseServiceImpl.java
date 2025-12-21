@@ -9,43 +9,73 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CourseService;
 import org.springframework.stereotype.Service;
 
-@Service   // 🔥 THIS WAS MISSING OR WRONG
+// @Service   // 🔥 THIS WAS MISSING OR WRONG
+// public class CourseServiceImpl implements CourseService {
+
+//     private final CourseRepository courseRepository;
+//     private final UserRepository userRepository;
+//     private final MicroLessonRepository microLessonRepository;
+
+//     public CourseServiceImpl(
+//             CourseRepository courseRepository,
+//             UserRepository userRepository,
+//             MicroLessonRepository microLessonRepository) {
+
+//         this.courseRepository = courseRepository;
+//         this.userRepository = userRepository;
+//         this.microLessonRepository = microLessonRepository;
+//     }
+
+//     @Override
+//     public Course createCourse(Course course, Long instructorId) {
+
+//         User instructor = userRepository.findById(instructorId)
+//                 .orElseThrow(() -> new RuntimeException("Instructor not found"));
+
+//         if (!"INSTRUCTOR".equals(instructor.getRole())) {
+//             throw new RuntimeException("User is not an instructor");
+//         }
+
+//         course.setInstructor(instructor);
+//         Course savedCourse = courseRepository.save(course);
+
+//         if (course.getLessons() != null) {
+//             for (MicroLesson lesson : course.getLessons()) {
+//                 lesson.setCourse(savedCourse);
+//                 microLessonRepository.save(lesson);
+//             }
+//         }
+
+//         return savedCourse;
+//     }
+// }
+@Service
 public class CourseServiceImpl implements CourseService {
 
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
-    private final MicroLessonRepository microLessonRepository;
+    private final CourseRepository repository;
 
-    public CourseServiceImpl(
-            CourseRepository courseRepository,
-            UserRepository userRepository,
-            MicroLessonRepository microLessonRepository) {
-
-        this.courseRepository = courseRepository;
-        this.userRepository = userRepository;
-        this.microLessonRepository = microLessonRepository;
+    public CourseServiceImpl(CourseRepository repository) {
+        this.repository = repository;
     }
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
+        return repository.save(course);
+    }
 
-        User instructor = userRepository.findById(instructorId)
-                .orElseThrow(() -> new RuntimeException("Instructor not found"));
+    @Override
+    public Course updateCourse(Long courseId, Course course) {
+        course.setId(courseId);
+        return repository.save(course);
+    }
 
-        if (!"INSTRUCTOR".equals(instructor.getRole())) {
-            throw new RuntimeException("User is not an instructor");
-        }
+    @Override
+    public Course getCourse(Long courseId) {
+        return repository.findById(courseId).orElseThrow();
+    }
 
-        course.setInstructor(instructor);
-        Course savedCourse = courseRepository.save(course);
-
-        if (course.getLessons() != null) {
-            for (MicroLesson lesson : course.getLessons()) {
-                lesson.setCourse(savedCourse);
-                microLessonRepository.save(lesson);
-            }
-        }
-
-        return savedCourse;
+    @Override
+    public List<Course> getInstructorCourses(Long instructorId) {
+        return repository.findByInstructorId(instructorId);
     }
 }

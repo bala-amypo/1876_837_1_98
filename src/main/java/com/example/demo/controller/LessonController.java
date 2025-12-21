@@ -8,14 +8,31 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/lessons")
 public class LessonController {
 
-    private final LessonService lessonService;
+    private final LessonService service;
 
-    public LessonController(LessonService lessonService) {
-        this.lessonService = lessonService;
+    public LessonController(LessonService service) {
+        this.service = service;
     }
 
+    // ✅ POST – add lesson to course
+    @PostMapping("/course/{courseId}")
+    public MicroLesson addLesson(
+            @PathVariable Long courseId,
+            @RequestBody MicroLesson lesson) {
+        return service.addLesson(courseId, lesson);
+    }
+
+    // ✅ PUT – update lesson
+    @PutMapping("/{lessonId}")
+    public MicroLesson updateLesson(
+            @PathVariable Long lessonId,
+            @RequestBody MicroLesson lesson) {
+        return service.updateLesson(lessonId, lesson);
+    }
+
+    // ✅ GET – lesson details
     @GetMapping("/{lessonId}")
     public MicroLesson getLesson(@PathVariable Long lessonId) {
-        return lessonService.getLesson(lessonId);
+        return service.getLesson(lessonId);
     }
 }

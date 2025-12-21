@@ -17,24 +17,15 @@ public class Recommendation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String basisSnapshot;
+    private BigDecimal confidenceScore;
+    private String recommendedLessonIds;
+    private String recommendationDetails;
+
+    @Column(name = "generated_at")
     private LocalDateTime generatedAt;
 
-    @Column(columnDefinition = "TEXT")
-    private String recommendedLessonIds;
-
-    @Column(columnDefinition = "TEXT")
-    private String basisSnapshot;
-
-    @Column(nullable = false, precision = 3, scale = 2)
-    private BigDecimal confidenceScore;
-
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
-
-    @PrePersist
-    public void onCreate() {
-        this.generatedAt = LocalDateTime.now();
-    }
 }
-

@@ -1,11 +1,15 @@
 package com.example.demo.dto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponse {
+public class ApiResponse<T> {
+
+    private boolean success;
     private String message;
-    private String role;
-    private String fullName;
+    private T data;  // can hold any type (User, Course, Lesson, etc.)
 }

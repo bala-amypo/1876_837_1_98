@@ -1,18 +1,16 @@
 package com.example.demo.service;
 
 import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.model.User;
 
 public interface UserService {
 
-    User register(User user);
+    User register(RegisterRequest request);
 
     AuthResponse login(String email, String password);
 
     User findById(Long id);
 
     User findByEmail(String email);
-
-    // ✅ Add this for editing user
-    User updateUser(Long id, User updatedUser);
 }

@@ -1,37 +1,43 @@
-package com.example.demo.model;
+package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import jakarta.validation.constraints.*;
+import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "recommendations")
 @Data
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Recommendation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     private LocalDateTime generatedAt;
 
-    private String recommendedLessonIds;
+    @NotBlank
+    @Size(max = 1000)
+    private String recommendedLessonIds; // comma-separated IDs
 
-    private String basisSnapshot;
+    @Size(max = 2000)
+    private String basisSnapshot; // JSON snapshot of criteria
 
+    @NotNull
+    @DecimalMin("0.0")
+    @DecimalMax("1.0")
     private BigDecimal confidenceScore;
 
     @PrePersist
-    public void prePersist() {
-        generatedAt = LocalDateTime.now();
+    protected void onCreate() {
+        this.generatedAt = LocalDateTime.now();
     }
 }

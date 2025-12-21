@@ -1,42 +1,38 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.model.Course;
+import com.example.demo.repository.CourseRepository;
 import com.example.demo.service.CourseService;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CourseServiceImpl implements CourseService {
 
-    private final List<Course> courses = new ArrayList<>();
-    private Long nextId = 1L;
+    private final CourseRepository courseRepository;
+
+    public CourseServiceImpl(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
-        course.setId(nextId++);
-        course.setInstructorId(instructorId); // set instructorId
-        courses.add(course);
-        return course;
+        course.setInstructorId(instructorId);
+        return courseRepository.save(course);
     }
 
     @Override
     public List<Course> getAllCourses() {
-        return courses;
+        return courseRepository.findAll();
     }
 
     @Override
     public Course getCourseById(Long id) {
-        Optional<Course> courseOpt = courses.stream()
-                .filter(c -> c.getId().equals(id))
-                .findFirst();
-        return courseOpt.orElse(null);
+        return courseRepository.findById(id).orElse(null);
     }
 
     @Override
     public void deleteCourse(Long id) {
-        courses.removeIf(c -> c.getId().equals(id));
+        courseRepository.deleteById(id);
     }
 }

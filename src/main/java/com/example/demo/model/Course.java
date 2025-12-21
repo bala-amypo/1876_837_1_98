@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "course") // ensure DB table matches
+@Table(name = "course")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

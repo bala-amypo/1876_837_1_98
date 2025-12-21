@@ -18,7 +18,7 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    // ✅ Create a new course
+   
     @PostMapping
     public ResponseEntity<Course> createCourse(@RequestParam Long instructorId,
                                                @RequestBody Course course) {
@@ -26,7 +26,6 @@ public class CourseController {
         return ResponseEntity.ok(created);
     }
 
-    // ✅ Update an existing course
     @PutMapping("/{courseId}")
     public ResponseEntity<Course> updateCourse(@PathVariable Long courseId,
                                                @RequestBody Course course) {
@@ -34,7 +33,7 @@ public class CourseController {
         return ResponseEntity.ok(updated);
     }
 
-    // ✅ Get all courses by instructor ID
+ 
     @GetMapping("/instructor/{instructorId}")
     public ResponseEntity<List<Course>> getCoursesByInstructor(@PathVariable Long instructorId) {
         return ResponseEntity.ok(courseService.listCoursesByInstructor(instructorId));

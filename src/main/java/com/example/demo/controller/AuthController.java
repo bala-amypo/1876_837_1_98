@@ -19,14 +19,13 @@ public class AuthController {
         this.userService = userService;
     }
 
-    // ✅ Register new user
+ 
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         User createdUser = userService.registerUser(user);
         return ResponseEntity.ok(createdUser);
     }
 
-    // ✅ Login existing user
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> loginUser(@RequestBody AuthRequest request) {
         AuthResponse response = userService.loginUser(request);

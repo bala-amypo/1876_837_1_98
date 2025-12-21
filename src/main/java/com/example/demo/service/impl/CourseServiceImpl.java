@@ -11,6 +11,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CourseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -32,33 +33,55 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
+        // Fetch instructor
         User instructor = userRepository.findById(instructorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor not found"));
 
+        // Role check
         if (!"INSTRUCTOR".equalsIgnoreCase(instructor.getRole()) &&
             !"ADMIN".equalsIgnoreCase(instructor.getRole())) {
             throw new ValidationException("User is not authorized to create courses");
         }
 
+        // Duplicate title check
         if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
             throw new ValidationException("Course title already exists for this instructor");
         }
 
+        // Assign instructor and save course first
         course.setInstructor(instructor);
-        Course savedCourse = courseRepository.save(course); // Save first to get ID
+        Course created = courseRepository.save(course);
 
-        if (course.getLessons() != null && !course.getLessons().isEmpty()) {
+        // Link lessons
+        if (course.getLessons() != null) {
             for (MicroLesson lesson : course.getLessons()) {
-                lesson.setCourse(savedCourse);
+                lesson.setCourse(created);
 
-                if (lesson.getContentType() == null) lesson.setContentType("VIDEO");
-                if (lesson.getDifficulty() == null) lesson.setDifficulty("BEGINNER");
+                // Defaults if missing
+                if (lesson.getContentType() == null || lesson.getContentType().trim().isEmpty())
+                    lesson.setContentType("VIDEO");
+
+                if (lesson.getDifficulty() == null || lesson.getDifficulty().trim().isEmpty())
+                    lesson.setDifficulty("BEGINNER");
+
+                if (lesson.getTags() == null) lesson.setTags("");
                 if (lesson.getPublishDate() == null) lesson.setPublishDate(LocalDate.now());
+
+                if (lesson.getTitle() == null || lesson.getTitle().trim().isEmpty()) {
+                    throw new ValidationException("Lesson title cannot be null or empty");
+                }
+
+                if (lesson.getDurationMinutes() == null || lesson.getDurationMinutes() <= 0
+                        || lesson.getDurationMinutes() > 15) {
+                    throw new ValidationException("Lesson duration must be between 1 and 15 minutes");
+                }
             }
+
+            // Save all lessons
             lessonRepository.saveAll(course.getLessons());
         }
 
-        return savedCourse;
+        return created;
     }
 
     @Override

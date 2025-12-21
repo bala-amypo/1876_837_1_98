@@ -33,47 +33,34 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
-        // Fetch instructor
         User instructor = userRepository.findById(instructorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor not found"));
 
-        // Role validation
         if (!"INSTRUCTOR".equalsIgnoreCase(instructor.getRole()) &&
             !"ADMIN".equalsIgnoreCase(instructor.getRole())) {
             throw new ValidationException("User is not authorized to create courses");
         }
 
-        // Duplicate title check
         if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
             throw new ValidationException("Course title already exists for this instructor");
         }
 
-        // Link instructor
         course.setInstructor(instructor);
-
-        // Save course first to get ID
         Course created = courseRepository.save(course);
 
-        // Handle nested lessons
         if (course.getLessons() != null && !course.getLessons().isEmpty()) {
             for (MicroLesson lesson : course.getLessons()) {
-                lesson.setCourse(created); // Link lesson to course
+                lesson.setCourse(created);
 
-                // Set default values
                 if (lesson.getContentType() == null || lesson.getContentType().trim().isEmpty()) {
                     lesson.setContentType("VIDEO");
                 }
                 if (lesson.getDifficulty() == null || lesson.getDifficulty().trim().isEmpty()) {
                     lesson.setDifficulty("BEGINNER");
                 }
-                if (lesson.getTags() == null) {
-                    lesson.setTags("");
-                }
-                if (lesson.getPublishDate() == null) {
-                    lesson.setPublishDate(LocalDate.now());
-                }
+                if (lesson.getTags() == null) lesson.setTags("");
+                if (lesson.getPublishDate() == null) lesson.setPublishDate(LocalDate.now());
 
-                // Validate title and duration
                 if (lesson.getTitle() == null || lesson.getTitle().trim().isEmpty()) {
                     throw new ValidationException("Lesson title cannot be null or empty");
                 }
@@ -82,7 +69,6 @@ public class CourseServiceImpl implements CourseService {
                 }
             }
 
-            // Save all lessons
             lessonRepository.saveAll(course.getLessons());
         }
 

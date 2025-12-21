@@ -1,13 +1,11 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "courses", uniqueConstraints = @UniqueConstraint(columnNames = {"title", "instructor_id"}))
+@Table(name = "courses")
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,25 +16,19 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 150)
+    @Column(nullable = false)
     private String title;
 
-    @Size(max = 500)
     private String description;
-
-    @NotBlank
-    @Size(max = 50)
     private String category;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "instructor_id", nullable = false)
-    private User instructor;
-
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "instructor_id")
+    private User instructor;
+
     @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
     }
 }

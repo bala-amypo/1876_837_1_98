@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "users")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -19,16 +19,14 @@ public class User {
 
     private String fullName;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    @Builder.Default
-    private String role = "LEARNER"; // LEARNER, INSTRUCTOR, ADMIN
+    private String role;
 
-    private String preferredLearningStyle; // VIDEO, TEXT, etc.
+    private String preferredLearningStyle;
 
     private LocalDateTime createdAt;
 
@@ -36,14 +34,16 @@ public class User {
     private List<Course> courses;
 
     @OneToMany(mappedBy = "user")
-    private List<Progress> progresses;
+    private List<Progress> progressList;
 
     @OneToMany(mappedBy = "user")
     private List<Recommendation> recommendations;
 
     @PrePersist
     public void prePersist() {
-        createdAt = LocalDateTime.now();
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
         if (role == null) {
             role = "LEARNER";
         }

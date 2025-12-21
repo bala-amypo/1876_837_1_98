@@ -1,48 +1,59 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.Course;
+import com.example.demo.model.User;
 import com.example.demo.repository.CourseRepository;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CourseService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
-    @Autowired
-    private CourseRepository courseRepository;
+    private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public Course createCourse(Course course) {
+    public Course createCourse(Course course, Long instructorId) {
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found"));
+        if (!"INSTRUCTOR".equals(instructor.getRole()) && !"ADMIN".equals(instructor.getRole())) {
+            throw new IllegalArgumentException("User is not an instructor");
+        }
+        if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
+            throw new IllegalArgumentException("Course title already exists for this instructor");
+        }
+        course.setInstructor(instructor);
         return courseRepository.save(course);
     }
 
     @Override
-    public List<Course> listAllCourses() {
-        return courseRepository.findAll();
-    }
+    public Course updateCourse(Long courseId, Course courseDetails) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
-    @Override
-    public Course getCourseById(Long id) {
-        Optional<Course> course = courseRepository.findById(id);
-        return course.orElseThrow(() -> new RuntimeException("Course not found"));
-    }
-
-    @Override
-    public Course updateCourse(Long id, Course courseDetails) {
-        Course course = getCourseById(id);
         course.setTitle(courseDetails.getTitle());
         course.setDescription(courseDetails.getDescription());
         course.setCategory(courseDetails.getCategory());
+
         return courseRepository.save(course);
     }
 
     @Override
-    public void deleteCourse(Long id) {
-        Course course = getCourseById(id);
-        courseRepository.delete(course);
+    public List<Course> listCoursesByInstructor(Long instructorId) {
+        return courseRepository.findAll().stream()
+                .filter(c -> c.getInstructor().getId().equals(instructorId))
+                .toList();
+    }
+
+    @Override
+    public Course getCourse(Long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
     }
 }

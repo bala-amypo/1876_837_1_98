@@ -8,34 +8,32 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "recommendations")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Recommendation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
     private LocalDateTime generatedAt;
 
-    @Column(length = 2000)
-    private String recommendedLessonIds; // comma-separated lesson IDs
+    private String recommendedLessonIds; // comma-separated IDs
 
-    @Column(length = 4000)
-    private String basisSnapshot; // JSON/text
+    @Column(columnDefinition = "TEXT")
+    private String basisSnapshot;
 
-    private BigDecimal confidenceScore; // 0.0–1.0
+    private BigDecimal confidenceScore; // 0.0 - 1.0
 
     @PrePersist
     public void prePersist() {
-        generatedAt = LocalDateTime.now();
-        if (confidenceScore == null) {
-            confidenceScore = BigDecimal.ZERO;
+        if (generatedAt == null) {
+            generatedAt = LocalDateTime.now();
         }
     }
 }

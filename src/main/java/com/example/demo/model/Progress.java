@@ -8,30 +8,35 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "progress")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Progress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "micro_lesson_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
     private MicroLesson microLesson;
 
     private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
-    private Integer progressPercent; // 0-100
+
+    private Integer progressPercent;
+
     private LocalDateTime lastAccessedAt;
+
     private BigDecimal score;
 
     @PrePersist
     public void prePersist() {
-        lastAccessedAt = LocalDateTime.now();
+        if (lastAccessedAt == null) {
+            lastAccessedAt = LocalDateTime.now();
+        }
     }
 }

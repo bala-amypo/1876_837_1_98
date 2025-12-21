@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -11,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Course {
 
     @Id
@@ -25,11 +28,15 @@ public class Course {
 
     private LocalDate createdAt;
 
-    @ManyToOne
+    // 👇 ONLY instructor ID will be shown, not full user
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id", nullable = false)
+    @JsonIgnoreProperties({"courses", "progresses", "recommendations", "password"})
     private User instructor;
 
+    // 👇 Avoid infinite recursion
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<MicroLesson> lessons;
 
     @PrePersist

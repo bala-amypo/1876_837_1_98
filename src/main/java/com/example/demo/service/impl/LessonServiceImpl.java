@@ -40,7 +40,6 @@ public class LessonServiceImpl implements LessonService {
             throw new ValidationException("Lesson title cannot be null or empty");
         }
 
-        // Set defaults
         if (lesson.getContentType() == null || lesson.getContentType().trim().isEmpty()) {
             lesson.setContentType("VIDEO");
         }
@@ -68,8 +67,9 @@ public class LessonServiceImpl implements LessonService {
         return lessonRepository.save(lesson);
     }
 
+    // ✅ method renamed to match interface
     @Override
-    public List<MicroLesson> findLessonsByFilters(String tags, String difficulty, String contentType) {
+    public List<MicroLesson> search(String tags, String difficulty, String contentType) {
         return lessonRepository.findByTagsContainingAndDifficultyAndContentType(tags, difficulty, contentType);
     }
 

@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Generic API Response wrapper for consistent success/error responses.
+ */
 @Data
 @Builder
 @NoArgsConstructor

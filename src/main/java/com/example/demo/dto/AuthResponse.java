@@ -13,6 +13,6 @@ public class AuthResponse {
     private Long userId;
     private String email;
     private String role;
-    private String token;  // JWT token (if using security)
+    private String token;
     private String message;
 }

@@ -1,12 +1,11 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "users")
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,29 +16,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 100)
     private String fullName;
 
-    @Email
-    @NotBlank
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @NotBlank
-    @Size(min = 8)
+    @Column(nullable = false)
     private String password;
 
-    @NotBlank
-    private String role = "LEARNER";
-
-    @Size(max = 50)
+    private String role;  // LEARNER / INSTRUCTOR / ADMIN
     private String preferredLearningStyle;
-
     private LocalDateTime createdAt;
 
     @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
     }
 }

@@ -31,7 +31,8 @@ public class LessonServiceImpl implements LessonService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
 
-        if (lesson.getDurationMinutes() == null || lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15) {
+        if (lesson.getDurationMinutes() == null ||
+                lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15) {
             throw new ValidationException("Lesson duration must be between 1 and 15 minutes");
         }
 
@@ -39,15 +40,13 @@ public class LessonServiceImpl implements LessonService {
             throw new ValidationException("Lesson title cannot be null or empty");
         }
 
-        // Set defaults if missing
+        // Set defaults
         if (lesson.getContentType() == null || lesson.getContentType().trim().isEmpty()) {
             lesson.setContentType("VIDEO");
         }
-
         if (lesson.getDifficulty() == null || lesson.getDifficulty().trim().isEmpty()) {
             lesson.setDifficulty("BEGINNER");
         }
-
         if (lesson.getTags() == null) lesson.setTags("");
         if (lesson.getPublishDate() == null) lesson.setPublishDate(LocalDate.now());
 

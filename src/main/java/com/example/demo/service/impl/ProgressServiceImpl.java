@@ -1,53 +1,56 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.model.MicroLesson;
-import com.example.demo.model.Progress;
-import com.example.demo.model.User;
-import com.example.demo.repository.MicroLessonRepository;
-import com.example.demo.repository.ProgressRepository;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.ValidationException;
+import com.example.demo.model.*;
+import com.example.demo.repository.*;
 import com.example.demo.service.ProgressService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@Transactional
 public class ProgressServiceImpl implements ProgressService {
 
     private final ProgressRepository progressRepository;
-    private final MicroLessonRepository microLessonRepository;
     private final UserRepository userRepository;
+    private final MicroLessonRepository lessonRepository;
 
-    @Override
-    public Progress startLesson(Long userId, Long lessonId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        MicroLesson lesson = microLessonRepository.findById(lessonId)
-                .orElseThrow(() -> new IllegalArgumentException("Lesson not found"));
-
-        Progress progress = progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
-                .orElse(Progress.builder()
-                        .user(user)
-                        .microLesson(lesson)
-                        .progressPercent(0.0)
-                        .startedAt(LocalDateTime.now())
-                        .build());
-
-        progress.setLastAccessedAt(LocalDateTime.now());
-        return progressRepository.save(progress);
+    public ProgressServiceImpl(ProgressRepository progressRepository,
+                               UserRepository userRepository,
+                               MicroLessonRepository lessonRepository) {
+        this.progressRepository = progressRepository;
+        this.userRepository = userRepository;
+        this.lessonRepository = lessonRepository;
     }
 
     @Override
-    public Progress completeLesson(Long userId, Long lessonId) {
-        Progress progress = progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
-                .orElseThrow(() -> new IllegalArgumentException("Progress record not found"));
+    public Progress recordProgress(Long userId, Long lessonId, Progress progress) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        progress.setProgressPercent(100.0);
-        progress.setCompletedAt(LocalDateTime.now());
-        return progressRepository.save(progress);
+        MicroLesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
+
+        if (progress.getProgressPercent() < 0 || progress.getProgressPercent() > 100) {
+            throw new ValidationException("Progress percent must be between 0 and 100");
+        }
+
+        Progress existing = progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
+                .orElse(Progress.builder().user(user).microLesson(lesson).build());
+
+        existing.setProgressPercent(progress.getProgressPercent());
+        existing.setStatus(progress.getStatus());
+        existing.setScore(progress.getScore());
+        return progressRepository.save(existing);
+    }
+
+    @Override
+    public Progress getProgress(Long userId, Long lessonId) {
+        return progressRepository.findByUserIdAndMicroLessonId(userId, lessonId)
+                .orElseThrow(() -> new ResourceNotFoundException("Progress not found"));
     }
 
     @Override

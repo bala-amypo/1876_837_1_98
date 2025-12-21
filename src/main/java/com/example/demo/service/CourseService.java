@@ -4,8 +4,12 @@ import com.example.demo.model.Course;
 import java.util.List;
 
 public interface CourseService {
+
     Course createCourse(Course course, Long instructorId);
-    List<Course> getAllCourses();
-    Course getCourseById(Long id);
-    void deleteCourse(Long id);
+
+    Course updateCourse(Long courseId, Course course);
+
+    List<Course> listCoursesByInstructor(Long instructorId);
+
+    Course getCourse(Long courseId);
 }

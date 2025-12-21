@@ -36,7 +36,7 @@ public class User {
     @PrePersist
     public void prePersist() {
         if (createdAt == null) {
-            createdAt = LocalDateTime.now();   // ✅ auto-set before insert
+            createdAt = LocalDateTime.now();
         }
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
-@Configuration
+@Configuration`
 public class SwaggerConfig {
 
     // ✅ Renamed bean from "customOpenAPI" to "swaggerOpenAPI"

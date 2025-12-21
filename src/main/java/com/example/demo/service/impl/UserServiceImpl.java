@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.dto.AuthResponse;
+import com.example.demo.dto.RegisterRequest;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.exception.ValidationException;
 import com.example.demo.model.User;
@@ -30,18 +31,24 @@ public class UserServiceImpl implements UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    // ✅ Register a new user using RegisterRequest DTO
     @Override
-    public User register(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+    public User register(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new ValidationException("Email already registered");
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            user.setRole("LEARNER");
-        }
+
+        User user = new User();
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole() != null ? request.getRole() : "LEARNER");
+        user.setPreferredLearningStyle(request.getPreferredLearningStyle());
+
         return userRepository.save(user);
     }
 
+    // ✅ Login user and return JWT token
     @Override
     public AuthResponse login(String email, String password) {
         User user = userRepository.findByEmail(email)
@@ -65,40 +72,17 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    // ✅ Find user by ID
     @Override
     public User findById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
+    // ✅ Find user by email
     @Override
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    }
-
-    // ✅ New updateUser implementation
-    @Override
-    public User updateUser(Long id, User updatedUser) {
-        User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
-        if (updatedUser.getFullName() != null) {
-            existingUser.setFullName(updatedUser.getFullName());
-        }
-        if (updatedUser.getEmail() != null) {
-            existingUser.setEmail(updatedUser.getEmail());
-        }
-        if (updatedUser.getPreferredLearningStyle() != null) {
-            existingUser.setPreferredLearningStyle(updatedUser.getPreferredLearningStyle());
-        }
-        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
-        }
-        if (updatedUser.getRole() != null && !updatedUser.getRole().isEmpty()) {
-            existingUser.setRole(updatedUser.getRole());
-        }
-
-        return userRepository.save(existingUser);
     }
 }

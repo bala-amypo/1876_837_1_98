@@ -1,19 +1,48 @@
-package com.example.demo.dto;
+package com.example.demo.controller;
 
-import jakarta.validation.constraints.NotNull;
+import com.example.demo.model.Course;
+import com.example.demo.model.Lesson;
+import com.example.demo.model.Instructor;
+import com.example.demo.repository.CourseRepository;
+import com.example.demo.repository.InstructorRepository;
+import com.example.demo.service.CourseService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-public class RecommendationRequest {
+@RestController
+@RequestMapping("/api/courses")
+public class CourseController {
 
-    @NotNull
-    private Long userId;
+    @Autowired
+    private CourseService courseService;
 
-    private List<Long> courseIds; // optional: to filter recommendations
+    @PostMapping
+    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
+        return ResponseEntity.ok(courseService.createCourse(course));
+    }
 
-    // Getters and setters
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    @GetMapping
+    public ResponseEntity<List<Course>> getAllCourses() {
+        return ResponseEntity.ok(courseService.listAllCourses());
+    }
 
-    public List<Long> getCourseIds() { return courseIds; }
-    public void setCourseIds(List<Long> courseIds) { this.courseIds = courseIds; }
+    @GetMapping("/{id}")
+    public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
+        return ResponseEntity.ok(courseService.getCourseById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody Course course) {
+        return ResponseEntity.ok(courseService.updateCourse(id, course));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
+        courseService.deleteCourse(id);
+        return ResponseEntity.noContent().build();
+    }
 }

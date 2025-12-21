@@ -1,13 +1,15 @@
 package com.example.demo.service;
 
-import com.example.demo.model.MicroLesson;
+import com.example.demo.dto.RecommendationRequest;
+import com.example.demo.model.Recommendation;
+
 import java.util.List;
 
 public interface RecommendationService {
 
-    List<MicroLesson> recommendLessons(
-            Long userId,
-            String difficulty,
-            String contentType
-    );
+    Recommendation generate(Long userId, RecommendationRequest request);
+
+    Recommendation getLatest(Long userId);
+
+    List<Recommendation> getByUser(Long userId);
 }

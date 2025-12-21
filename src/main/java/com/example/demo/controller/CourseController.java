@@ -39,7 +39,7 @@ public class CourseController {
         return ResponseEntity.ok(courseService.listCoursesByInstructor(instructorId));
     }
 
-    // ✅ Get a single course
+   
     @GetMapping("/{courseId}")
     public ResponseEntity<Course> getCourse(@PathVariable Long courseId) {
         return ResponseEntity.ok(courseService.getCourse(courseId));

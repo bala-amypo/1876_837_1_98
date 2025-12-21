@@ -14,7 +14,7 @@ public class LessonController {
         this.service = service;
     }
 
-    // ✅ POST – add lesson to course
+ 
     @PostMapping("/course/{courseId}")
     public MicroLesson addLesson(
             @PathVariable Long courseId,
@@ -22,7 +22,7 @@ public class LessonController {
         return service.addLesson(courseId, lesson);
     }
 
-    // ✅ PUT – update lesson
+    // 
     @PutMapping("/{lessonId}")
     public MicroLesson updateLesson(
             @PathVariable Long lessonId,
@@ -30,7 +30,7 @@ public class LessonController {
         return service.updateLesson(lessonId, lesson);
     }
 
-    // ✅ GET – lesson details
+   
     @GetMapping("/{lessonId}")
     public MicroLesson getLesson(@PathVariable Long lessonId) {
         return service.getLesson(lessonId);

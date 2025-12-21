@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.RecommendationRequest;
+import com.example.demo.model.Recommendation;
 import com.example.demo.service.RecommendationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,15 +17,20 @@ public class RecommendationController {
         this.service = service;
     }
 
-    // ✅ POST – generate recommendation
-    @PostMapping("/generate")
-    public List<String> generate() {
-        return service.generate();
+    @PostMapping("/generate/{userId}")
+    public Recommendation generate(
+            @PathVariable Long userId,
+            @RequestBody RecommendationRequest request) {
+        return service.generate(userId, request);
     }
 
-    // ✅ GET – latest recommendation
-    @GetMapping("/latest")
-    public List<String> latest() {
-        return service.generate();
+    @GetMapping("/latest/{userId}")
+    public Recommendation latest(@PathVariable Long userId) {
+        return service.getLatest(userId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Recommendation> byUser(@PathVariable Long userId) {
+        return service.getByUser(userId);
     }
 }

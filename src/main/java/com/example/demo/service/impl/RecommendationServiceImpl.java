@@ -69,8 +69,10 @@
 //         return recommendationRepository.findByUserIdAndGeneratedAtBetween(userId, start, end);
 //     }
 // }
+
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.RecommendationRequest;
 import com.example.demo.model.*;
 import com.example.demo.repository.*;
 import com.example.demo.service.RecommendationService;
@@ -79,6 +81,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,44 +90,38 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RecommendationServiceImpl implements RecommendationService {
 
+    private final RecommendationRepository recommendationRepository;
     private final UserRepository userRepository;
     private final MicroLessonRepository microLessonRepository;
     private final ProgressRepository progressRepository;
-    private final RecommendationRepository recommendationRepository;
 
     @Override
-    public Recommendation generateRecommendation(Long userId,
-                                                   String difficulty,
-                                                   String contentType,
-                                                   String tags) {
+    public Recommendation generateRecommendation(Long userId, RecommendationRequest request) {
 
-        // 1. Fetch user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 2. Fetch matching lessons
         List<MicroLesson> lessons =
                 microLessonRepository.findByTagsContainingAndDifficultyAndContentType(
-                        tags, difficulty, contentType
+                        request.getTags(),
+                        request.getDifficulty(),
+                        request.getContentType()
                 );
 
         if (lessons.isEmpty()) {
             throw new RuntimeException("No lessons found for recommendation");
         }
 
-        // 3. Build recommended lesson IDs (CSV / JSON-like)
-        String recommendedLessonIds = lessons.stream()
-                .map(lesson -> lesson.getId().toString())
-                .collect(Collectors.joining(",", "[", "]"));
+        String lessonIds = lessons.stream()
+                .map(l -> l.getId().toString())
+                .collect(Collectors.joining(","));
 
-        // 4. Calculate confidence score
         BigDecimal confidenceScore = calculateConfidenceScore(user, lessons);
 
-        // 5. Create recommendation
         Recommendation recommendation = Recommendation.builder()
                 .user(user)
-                .recommendedLessonIds(recommendedLessonIds)
-                .basisSnapshot(buildBasisSnapshot(user, difficulty, contentType, tags))
+                .recommendedLessonIds(lessonIds)
+                .basisSnapshot(buildBasisSnapshot(user, request))
                 .confidenceScore(confidenceScore)
                 .generatedAt(LocalDateTime.now())
                 .build();
@@ -132,45 +129,48 @@ public class RecommendationServiceImpl implements RecommendationService {
         return recommendationRepository.save(recommendation);
     }
 
-    /**
-     * Calculates confidence score between 0.00 and 1.00
-     */
+    @Override
+    public Recommendation getLatestRecommendation(Long userId) {
+        return recommendationRepository.findByUserIdOrderByGeneratedAtDesc(userId)
+                .stream()
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No recommendations found"));
+    }
+
+    @Override
+    public List<Recommendation> getRecommendations(Long userId, LocalDate from, LocalDate to) {
+
+        LocalDateTime start = from.atStartOfDay();
+        LocalDateTime end = to.atTime(23, 59, 59);
+
+        return recommendationRepository
+                .findByUserIdAndGeneratedAtBetween(userId, start, end);
+    }
+
     private BigDecimal calculateConfidenceScore(User user, List<MicroLesson> lessons) {
 
-        List<Progress> completedProgress =
-                progressRepository.findAll().stream()
-                        .filter(p ->
-                                p.getUser().getId().equals(user.getId()) &&
-                                "COMPLETED".equals(p.getStatus()))
-                        .collect(Collectors.toList());
+        long completedCount = progressRepository.findAll().stream()
+                .filter(p ->
+                        p.getUser().getId().equals(user.getId()) &&
+                        "COMPLETED".equals(p.getStatus()))
+                .count();
 
-        if (completedProgress.isEmpty()) {
-            return BigDecimal.valueOf(0.50).setScale(2, RoundingMode.HALF_UP);
+        if (completedCount == 0) {
+            return BigDecimal.valueOf(0.50);
         }
 
-        BigDecimal completedCount = BigDecimal.valueOf(completedProgress.size());
-        BigDecimal lessonCount = BigDecimal.valueOf(lessons.size());
-
-        return completedCount
-                .divide(lessonCount, 2, RoundingMode.HALF_UP)
+        return BigDecimal.valueOf(completedCount)
+                .divide(BigDecimal.valueOf(lessons.size()), 2, RoundingMode.HALF_UP)
                 .min(BigDecimal.ONE);
     }
 
-    /**
-     * Creates a snapshot of recommendation conditions
-     */
-    private String buildBasisSnapshot(User user,
-                                      String difficulty,
-                                      String contentType,
-                                      String tags) {
-
+    private String buildBasisSnapshot(User user, RecommendationRequest request) {
         return String.format(
-                "User:%s | Role:%s | Difficulty:%s | ContentType:%s | Tags:%s",
+                "{ \"user\": \"%s\", \"difficulty\": \"%s\", \"contentType\": \"%s\", \"tags\": \"%s\" }",
                 user.getEmail(),
-                user.getRole(),
-                difficulty,
-                contentType,
-                tags
+                request.getDifficulty(),
+                request.getContentType(),
+                request.getTags()
         );
     }
 }

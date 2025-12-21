@@ -1,10 +1,3 @@
-package com.example.demo.model;
-
-import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Entity
 @Table(name = "users")
 @Data
@@ -27,16 +20,18 @@ public class User {
 
     private String role; // LEARNER, INSTRUCTOR, ADMIN
     private String preferredLearningStyle;
-
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"instructor"})
     private List<Course> courses;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"user"})
     private List<Progress> progresses;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"user"})
     private List<Recommendation> recommendations;
 
     @PrePersist

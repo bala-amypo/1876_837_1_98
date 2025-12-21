@@ -2,38 +2,44 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Progress;
 import com.example.demo.service.ProgressService;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/progress")
-@Tag(name = "Progress Tracking", description = "APIs for tracking learner progress")
+@RequestMapping("/api/progress")
 public class ProgressController {
 
-    private final ProgressService progressService;
+    private final ProgressService service;
 
-    public ProgressController(ProgressService progressService) {
-        this.progressService = progressService;
+    public ProgressController(ProgressService service) {
+        this.service = service;
     }
 
-    @PostMapping("/{lessonId}")
-    public ResponseEntity<Progress> recordProgress(@RequestParam Long userId,
-                                                   @PathVariable Long lessonId,
-                                                   @RequestBody Progress progress) {
-        Progress saved = progressService.recordProgress(userId, lessonId, progress);
-        return ResponseEntity.ok(saved);
+    @GetMapping
+    public List<Progress> getAllProgress() {
+        return service.getAllProgress();
     }
 
-    @GetMapping("/lesson/{lessonId}")
-    public ResponseEntity<Progress> getProgress(@RequestParam Long userId,
-                                                @PathVariable Long lessonId) {
-        return ResponseEntity.ok(progressService.getProgress(userId, lessonId));
+    @GetMapping("/{id}")
+    public Progress getProgress(@PathVariable Long id) {
+        return service.getProgressById(id);
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Progress>> getUserProgress(@PathVariable Long userId) {
-        return ResponseEntity.ok(progressService.getUserProgress(userId));
+    @PostMapping
+    public Progress createProgress(@RequestBody Progress progress) {
+        return service.createProgress(progress);
+    }
+
+    @PutMapping("/{id}")
+    public Progress updateProgress(@PathVariable Long id, @RequestBody Progress progress) {
+        return service.updateProgress(id, progress);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProgress(@PathVariable Long id) {
+        service.deleteProgress(id);
+        return ResponseEntity.noContent().build();
     }
 }

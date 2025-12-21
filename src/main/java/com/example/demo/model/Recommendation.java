@@ -1,10 +1,3 @@
-package com.example.demo.model;
-
-import jakarta.persistence.*;
-import lombok.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "recommendations")
 @Data
@@ -24,6 +17,7 @@ public class Recommendation {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"recommendations","progresses"})
     private User user;
 
     @PrePersist

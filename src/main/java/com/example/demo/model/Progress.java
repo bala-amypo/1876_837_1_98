@@ -1,10 +1,3 @@
-package com.example.demo.model;
-
-import jakarta.persistence.*;
-import lombok.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "progress")
 @Data
@@ -24,10 +17,12 @@ public class Progress {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"progresses","recommendations"})
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "micro_lesson_id", nullable = false)
+    @JsonIgnoreProperties({"progressList"})
     private MicroLesson microLesson;
 
     @PrePersist

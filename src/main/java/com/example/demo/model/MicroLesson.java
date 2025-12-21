@@ -1,10 +1,8 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
 
 @Entity
-@Table(name = "micro_lessons")
 public class MicroLesson {
 
     @Id
@@ -12,15 +10,21 @@ public class MicroLesson {
     private Long id;
 
     private String title;
-    private Integer durationMinutes;
     private String contentType;
     private String difficulty;
+    private Integer durationMinutes;
     private String tags;
-    private LocalDate publishDate;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id", nullable = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "course_id")
     private Course course;
 
-    // getters & setters
+    // getters/setters
+    public Long getId() { return id; }
+
+    public Course getCourse() { return course; }
+    public void setCourse(Course course) { this.course = course; }
+
+    public String getTags() { return tags; }
+    public void setTags(String tags) { this.tags = tags; }
 }

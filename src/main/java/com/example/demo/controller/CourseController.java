@@ -1,48 +1,19 @@
-package com.example.demo.controller;
+package com.example.demo.dto;
 
-import com.example.demo.dto.CourseDTO;
-import com.example.demo.entity.Course;
-import com.example.demo.service.CourseService;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
-@RestController
-@RequestMapping("/api/courses")
-public class CourseController {
+public class RecommendationRequest {
 
-    @Autowired
-    private CourseService courseService;
+    @NotNull
+    private Long userId;
 
-    // CREATE
-    @PostMapping
-    public ResponseEntity<Course> createCourse(
-            @RequestParam Long instructorId,
-            @Valid @RequestBody CourseDTO courseDTO
-    ) {
-        return ResponseEntity.ok(courseService.createCourse(courseDTO, instructorId));
-    }
+    private List<Long> courseIds; // optional: to filter recommendations
 
-    // READ
-    @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourse(@PathVariable Long id) {
-        return ResponseEntity.ok(courseService.getCourse(id));
-    }
+    // Getters and setters
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    // UPDATE
-    @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(
-            @PathVariable Long id,
-            @Valid @RequestBody CourseDTO courseDTO
-    ) {
-        return ResponseEntity.ok(courseService.updateCourse(id, courseDTO));
-    }
-
-    // DELETE
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long id) {
-        courseService.deleteCourse(id);
-        return ResponseEntity.ok("Course deleted successfully");
-    }
+    public List<Long> getCourseIds() { return courseIds; }
+    public void setCourseIds(List<Long> courseIds) { this.courseIds = courseIds; }
 }

@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,11 +28,8 @@ public class User {
     private String role; // STUDENT / INSTRUCTOR / ADMIN
 
     private String preferredLearningStyle;
-
     private LocalDate createdAt;
 
     @PrePersist
-    public void prePersist() {
-        if (createdAt == null) createdAt = LocalDate.now();
-    }
+    public void prePersist() { if (createdAt == null) createdAt = LocalDate.now(); }
 }

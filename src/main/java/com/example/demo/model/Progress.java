@@ -11,12 +11,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Progress {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status; // IN_PROGRESS / COMPLETED
+    private String status;
     private Integer progressPercent;
     private Integer score;
     private LocalDateTime lastAccessedAt;

@@ -76,7 +76,6 @@ public class Course {
         this.instructor = instructor;
     }
 
-    // ✅ THIS WAS MISSING
     public List<MicroLesson> getLessons() {
         return lessons;
     }

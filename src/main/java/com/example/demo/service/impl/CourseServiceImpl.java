@@ -11,7 +11,6 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CourseService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,7 +32,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
-        // Check instructor exists
         User instructor = userRepository.findById(instructorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor not found"));
 
@@ -42,30 +40,37 @@ public class CourseServiceImpl implements CourseService {
             throw new ValidationException("User is not authorized to create courses");
         }
 
+        if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
+            throw new ValidationException("Course title already exists for this instructor");
+        }
+
         course.setInstructor(instructor);
+        Course savedCourse = courseRepository.save(course); // Save first to get ID
 
-        // First save course to generate ID
-        Course created = courseRepository.save(course);
-
-        // Save lessons if any
         if (course.getLessons() != null && !course.getLessons().isEmpty()) {
             for (MicroLesson lesson : course.getLessons()) {
-                lesson.setCourse(created); // set course reference
+                lesson.setCourse(savedCourse);
 
-                // Defaults
                 if (lesson.getContentType() == null) lesson.setContentType("VIDEO");
                 if (lesson.getDifficulty() == null) lesson.setDifficulty("BEGINNER");
                 if (lesson.getPublishDate() == null) lesson.setPublishDate(LocalDate.now());
-
-                if (lesson.getTitle() == null || lesson.getTitle().trim().isEmpty())
-                    throw new ValidationException("Lesson title cannot be empty");
-                if (lesson.getDurationMinutes() == null || lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15)
-                    throw new ValidationException("Lesson duration must be 1-15 minutes");
             }
             lessonRepository.saveAll(course.getLessons());
         }
 
-        return created;
+        return savedCourse;
+    }
+
+    @Override
+    public Course updateCourse(Long courseId, Course updatedCourse) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+
+        course.setTitle(updatedCourse.getTitle());
+        course.setDescription(updatedCourse.getDescription());
+        course.setCategory(updatedCourse.getCategory());
+
+        return courseRepository.save(course);
     }
 
     @Override

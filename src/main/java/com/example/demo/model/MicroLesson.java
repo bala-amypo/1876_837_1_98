@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -33,12 +32,7 @@ public class MicroLesson {
     private String tags;
     private LocalDate publishDate;
 
-    // 👇 Prevent recursion
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
-    @JsonBackReference
     private Course course;
-
-    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL)
-    private List<Progress> progressList;
 }

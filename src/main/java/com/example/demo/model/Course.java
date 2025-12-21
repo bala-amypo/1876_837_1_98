@@ -1,7 +1,10 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -9,7 +12,6 @@ import java.util.List;
 @Table(name = "courses")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Course {
 
@@ -27,7 +29,6 @@ public class Course {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "instructor_id")
     private User instructor;
 
     @OneToMany(mappedBy = "course")
@@ -35,8 +36,6 @@ public class Course {
 
     @PrePersist
     public void prePersist() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
+        createdAt = LocalDateTime.now();
     }
 }

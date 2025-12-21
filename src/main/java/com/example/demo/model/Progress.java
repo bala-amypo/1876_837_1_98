@@ -1,7 +1,10 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -9,7 +12,6 @@ import java.time.LocalDateTime;
 @Table(name = "progress")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class Progress {
 
@@ -18,11 +20,9 @@ public class Progress {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "lesson_id")
     private MicroLesson microLesson;
 
     private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
@@ -35,8 +35,6 @@ public class Progress {
 
     @PrePersist
     public void prePersist() {
-        if (lastAccessedAt == null) {
-            lastAccessedAt = LocalDateTime.now();
-        }
+        lastAccessedAt = LocalDateTime.now();
     }
 }

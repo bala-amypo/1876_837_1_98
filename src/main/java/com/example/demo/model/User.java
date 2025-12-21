@@ -1,8 +1,9 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,9 +12,9 @@ import java.util.List;
 @Table(name = "users")
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,23 +24,21 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
     private String password;
 
-    private String role;
+    private String role; // LEARNER, INSTRUCTOR, ADMIN
 
     private String preferredLearningStyle;
 
-    @CreatedDate
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "instructor")
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Progress> progress;
+    @OneToMany(mappedBy = "user")
+    private List<Progress> progresses;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     private List<Recommendation> recommendations;
 
     @PrePersist

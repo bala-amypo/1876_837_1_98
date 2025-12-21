@@ -26,11 +26,8 @@ public class Progress {
     private MicroLesson microLesson;
 
     private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
-
-    private Integer progressPercent; // 0–100
-
+    private Integer progressPercent; // 0-100
     private LocalDateTime lastAccessedAt;
-
     private BigDecimal score;
 
     @PrePersist

@@ -12,15 +12,16 @@ import java.util.List;
 @Configuration
 public class SwaggerConfig {
 
-    @Bean
-    public OpenAPI customOpenAPI() {
+    // ✅ Renamed bean from "customOpenAPI" to "swaggerOpenAPI"
+    @Bean(name = "swaggerOpenAPI")
+    public OpenAPI swaggerOpenAPI() {
         final String securitySchemeName = "JWT";
 
         return new OpenAPI()
                 .info(new Info()
-                        .title("Micro-Learning Content Recommendation API")
+                        .title("Micro-Learning Content Recommendation API (Swagger UI)")
                         .version("1.0.0")
-                        .description("REST API for Micro-Learning Content & Personalized Recommendations"))
+                        .description("JWT-secured REST API documentation for micro-learning portal"))
                 .addServersItem(new Server().url("http://localhost:9001"))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new io.swagger.v3.oas.models.Components()

@@ -1,5 +1,7 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.ValidationException;
 import com.example.demo.model.Course;
 import com.example.demo.model.MicroLesson;
 import com.example.demo.model.User;
@@ -8,74 +10,101 @@ import com.example.demo.repository.MicroLessonRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CourseService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-// @Service   // 🔥 THIS WAS MISSING OR WRONG
-// public class CourseServiceImpl implements CourseService {
+import java.time.LocalDate;
+import java.util.List;
 
-//     private final CourseRepository courseRepository;
-//     private final UserRepository userRepository;
-//     private final MicroLessonRepository microLessonRepository;
-
-//     public CourseServiceImpl(
-//             CourseRepository courseRepository,
-//             UserRepository userRepository,
-//             MicroLessonRepository microLessonRepository) {
-
-//         this.courseRepository = courseRepository;
-//         this.userRepository = userRepository;
-//         this.microLessonRepository = microLessonRepository;
-//     }
-
-//     @Override
-//     public Course createCourse(Course course, Long instructorId) {
-
-//         User instructor = userRepository.findById(instructorId)
-//                 .orElseThrow(() -> new RuntimeException("Instructor not found"));
-
-//         if (!"INSTRUCTOR".equals(instructor.getRole())) {
-//             throw new RuntimeException("User is not an instructor");
-//         }
-
-//         course.setInstructor(instructor);
-//         Course savedCourse = courseRepository.save(course);
-
-//         if (course.getLessons() != null) {
-//             for (MicroLesson lesson : course.getLessons()) {
-//                 lesson.setCourse(savedCourse);
-//                 microLessonRepository.save(lesson);
-//             }
-//         }
-
-//         return savedCourse;
-//     }
-// }
 @Service
+@Transactional
 public class CourseServiceImpl implements CourseService {
 
-    private final CourseRepository repository;
+    private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
+    private final MicroLessonRepository lessonRepository;
 
-    public CourseServiceImpl(CourseRepository repository) {
-        this.repository = repository;
+    public CourseServiceImpl(CourseRepository courseRepository,
+                             UserRepository userRepository,
+                             MicroLessonRepository lessonRepository) {
+        this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
+        this.lessonRepository = lessonRepository;
     }
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
-        return repository.save(course);
+        // ✅ 1. Fetch instructor
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor not found"));
+
+        // ✅ 2. Role validation
+        if (!"INSTRUCTOR".equalsIgnoreCase(instructor.getRole()) &&
+            !"ADMIN".equalsIgnoreCase(instructor.getRole())) {
+            throw new ValidationException("User is not authorized to create courses");
+        }
+
+        // ✅ 3. Prevent duplicate course titles per instructor
+        if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
+            throw new ValidationException("Course title already exists for this instructor");
+        }
+
+        // ✅ 4. Link instructor
+        course.setInstructor(instructor);
+
+        // ✅ 5. Save course first to generate ID
+        Course created = courseRepository.save(course);
+
+        // ✅ 6. Save lessons (if included)
+        if (course.getLessons() != null && !course.getLessons().isEmpty()) {
+            for (MicroLesson lesson : course.getLessons()) {
+                lesson.setCourse(created); // link to saved course
+
+                // Set default values to avoid NULLs
+                if (lesson.getContentType() == null || lesson.getContentType().trim().isEmpty())
+                    lesson.setContentType("VIDEO");
+
+                if (lesson.getDifficulty() == null || lesson.getDifficulty().trim().isEmpty())
+                    lesson.setDifficulty("BEGINNER");
+
+                if (lesson.getTags() == null) lesson.setTags("");
+
+                if (lesson.getPublishDate() == null) lesson.setPublishDate(LocalDate.now());
+
+                // Validate title and duration
+                if (lesson.getTitle() == null || lesson.getTitle().trim().isEmpty())
+                    throw new ValidationException("Lesson title cannot be null or empty");
+
+                if (lesson.getDurationMinutes() == null ||
+                        lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15)
+                    throw new ValidationException("Lesson duration must be between 1 and 15 minutes");
+            }
+
+            lessonRepository.saveAll(course.getLessons());
+        }
+
+        return created;
     }
 
     @Override
-    public Course updateCourse(Long courseId, Course course) {
-        course.setId(courseId);
-        return repository.save(course);
+    public Course updateCourse(Long courseId, Course updatedCourse) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+
+        course.setTitle(updatedCourse.getTitle());
+        course.setDescription(updatedCourse.getDescription());
+        course.setCategory(updatedCourse.getCategory());
+
+        return courseRepository.save(course);
+    }
+
+    @Override
+    public List<Course> listCoursesByInstructor(Long instructorId) {
+        return courseRepository.findByInstructorId(instructorId);
     }
 
     @Override
     public Course getCourse(Long courseId) {
-        return repository.findById(courseId).orElseThrow();
-    }
-
-    @Override
-    public List<Course> getInstructorCourses(Long instructorId) {
-        return repository.findByInstructorId(instructorId);
+        return courseRepository.findById(courseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
     }
 }

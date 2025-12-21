@@ -27,7 +27,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 🔹 Add this bean
+    // 🔹 This bean is REQUIRED
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

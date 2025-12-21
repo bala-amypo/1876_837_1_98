@@ -17,22 +17,25 @@ public class MicroLesson {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(nullable = false)
     private Integer durationMinutes;
 
-    private String contentType;
+    @Column(nullable = false)
+    private String contentType; // VIDEO, TEXT
 
-    private String difficulty;
+    @Column(nullable = false)
+    private String difficulty;  // BEGINNER, INTERMEDIATE, ADVANCED
 
     private String tags;
-
     private LocalDate publishDate;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL)
     private List<Progress> progressList;
 }

@@ -2,7 +2,6 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -20,7 +19,7 @@ public class Progress {
     private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
     private Integer progressPercent;
     private LocalDateTime lastAccessedAt;
-    private BigDecimal score;
+    private Double score;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -29,9 +28,4 @@ public class Progress {
     @ManyToOne
     @JoinColumn(name = "micro_lesson_id", nullable = false)
     private MicroLesson microLesson;
-
-    @PrePersist
-    public void prePersist() {
-        this.lastAccessedAt = LocalDateTime.now();
-    }
 }

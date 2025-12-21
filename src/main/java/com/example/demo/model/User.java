@@ -17,15 +17,18 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String fullName;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String password;
 
-    private String role; // LEARNER, INSTRUCTOR, ADMIN
+    @Column(nullable = false)
+    private String role; // ADMIN, INSTRUCTOR, STUDENT
+
     private String preferredLearningStyle;
 
     private LocalDateTime createdAt;
@@ -38,9 +41,4 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Recommendation> recommendations;
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 }

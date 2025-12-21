@@ -37,3 +37,43 @@
 //         return ResponseEntity.ok(recommendationService.getRecommendations(userId, from, to));
 //     }
 // }
+package com.example.demo.controller;
+
+import com.example.demo.dto.RecommendationRequest;
+import com.example.demo.model.Recommendation;
+import com.example.demo.service.RecommendationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping("/recommendations")
+@RequiredArgsConstructor
+public class RecommendationController {
+
+    private final RecommendationService recommendationService;
+
+    @PostMapping("/generate/{userId}")
+    public Recommendation generateRecommendation(
+            @PathVariable Long userId,
+            @RequestBody RecommendationRequest request) {
+
+        return recommendationService.generateRecommendation(userId, request);
+    }
+
+    @GetMapping("/latest/{userId}")
+    public Recommendation getLatest(@PathVariable Long userId) {
+        return recommendationService.getLatestRecommendation(userId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Recommendation> getUserRecommendations(
+            @PathVariable Long userId,
+            @RequestParam LocalDate from,
+            @RequestParam LocalDate to) {
+
+        return recommendationService.getRecommendations(userId, from, to);
+    }
+}

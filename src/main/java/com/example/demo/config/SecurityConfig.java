@@ -15,21 +15,16 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeHttpRequests()
-                .requestMatchers(
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html"
-                ).permitAll()
-                .requestMatchers("/**").permitAll()
-            .anyRequest().authenticated()
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .anyRequest().authenticated()
             .and()
             .httpBasic();
         return http.build();
     }
 
-    // 🔹 This bean is REQUIRED
+    // ✅ This is critical: exposes BCryptPasswordEncoder as a bean
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

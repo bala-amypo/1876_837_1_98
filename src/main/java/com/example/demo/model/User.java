@@ -2,6 +2,8 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,7 +14,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,30 +23,28 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
     private String role;
 
     private String preferredLearningStyle;
 
+    @CreatedDate
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "instructor")
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
     private List<Course> courses;
 
-    @OneToMany(mappedBy = "user")
-    private List<Progress> progressList;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Progress> progress;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Recommendation> recommendations;
 
     @PrePersist
     public void prePersist() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-        if (role == null) {
-            role = "LEARNER";
-        }
+        createdAt = LocalDateTime.now();
+        if (role == null) role = "LEARNER";
     }
 }

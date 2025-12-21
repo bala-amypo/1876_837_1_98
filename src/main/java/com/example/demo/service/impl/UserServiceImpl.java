@@ -9,39 +9,33 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
-    public User register(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new IllegalArgumentException("Email already registered: " + user.getEmail());
-        }
-
+    public User registerUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-        if (user.getRole() == null) {
-            user.setRole("LEARNER");
-        }
-
+        user.setRole(user.getRole() == null ? "LEARNER" : user.getRole());
         return userRepository.save(user);
     }
 
     @Override
-    public AuthResponse login(String email, String password) {
+    public AuthResponse loginUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("Invalid email or password");
+            throw new IllegalArgumentException("Invalid credentials");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        String token = jwtUtil.generateToken(user.getEmail());
 
         return AuthResponse.builder()
                 .userId(user.getId())
@@ -53,14 +47,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email)
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }

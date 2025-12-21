@@ -2,24 +2,32 @@ package com.example.demo.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
-import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
-    private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private static final String SECRET_KEY = "microLearningSecretKey";
 
+    // ✅ One-argument version
+    public String generateToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
+    }
+
+    // ✅ Two-argument version (for role support)
     public String generateToken(String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(secretKey)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Authentication", description = "User Registration & Login APIs")
+@Tag(name = "Authentication", description = "User Registration, Login & Edit APIs")
 public class AuthController {
 
     private final UserService userService;
@@ -29,5 +29,15 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         AuthResponse response = userService.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok(response);
+    }
+
+    // ✅ New endpoint for editing user
+    @PutMapping("/users/{id}")
+    public ResponseEntity<User> updateUser(
+            @PathVariable Long id,
+            @RequestBody User updatedUser) {
+
+        User user = userService.updateUser(id, updatedUser);
+        return ResponseEntity.ok(user);
     }
 }

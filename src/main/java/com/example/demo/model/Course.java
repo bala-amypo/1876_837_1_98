@@ -1,25 +1,38 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
+@Table(name = "courses")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
-    private Long instructorId; // Make sure this exists
+    private String description;
+    private String category;
+    private LocalDateTime createdAt;
 
-    // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @ManyToOne
+    @JoinColumn(name = "instructor_id", nullable = false)
+    private User instructor;
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<MicroLesson> lessons;
 
-    public Long getInstructorId() { return instructorId; }
-    public void setInstructorId(Long instructorId) { this.instructorId = instructorId; }
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

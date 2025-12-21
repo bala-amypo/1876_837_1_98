@@ -5,37 +5,36 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.demo.model.User;
-import com.example.demo.model.MicroLesson;
-
-import java.io.Serializable;
-
 @Entity
 @Table(name = "progress")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Progress implements Serializable {
+public class Progress {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status;
-    private Integer progressPercent;
-    private LocalDateTime lastAccessedAt;
-    private BigDecimal score;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "micro_lesson_id", nullable = false)
     private MicroLesson microLesson;
 
+    private String status; // NOT_STARTED, IN_PROGRESS, COMPLETED
+
+    private Integer progressPercent; // 0–100
+
+    private LocalDateTime lastAccessedAt;
+
+    private BigDecimal score;
+
     @PrePersist
     public void prePersist() {
-        this.lastAccessedAt = LocalDateTime.now();
+        lastAccessedAt = LocalDateTime.now();
     }
 }

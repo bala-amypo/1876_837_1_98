@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "courses")
+@Table(name = "courses", uniqueConstraints = @UniqueConstraint(columnNames = {"title", "instructor_id"}))
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Course {
 
     @Id
@@ -21,18 +21,20 @@ public class Course {
     private String title;
 
     private String description;
+
     private String category;
+
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course")
     private List<MicroLesson> lessons;
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 }

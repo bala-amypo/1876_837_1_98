@@ -1,28 +1,43 @@
+package com.example.demo.model;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDate;
+
+import java.util.List;
+
 @Entity
 @Table(name = "micro_lessons")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class MicroLesson {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
-    private Integer durationMinutes;
-    private String contentType; // VIDEO, TEXT
-    private String difficulty;  // BEGINNER, INTERMEDIATE, ADVANCED
-    private String tags;
-    private LocalDate publishDate;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
-    @JsonIgnoreProperties({"microLessons"})
     private Course course;
 
-    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties({"microLesson"})
-    private List<Progress> progressList;
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private Integer durationMinutes; // 1–15
+
+    @Column(nullable = false)
+    private String contentType; // VIDEO, TEXT
+
+    @Column(nullable = false)
+    private String difficulty; // BEGINNER, INTERMEDIATE, ADVANCED
+
+    private String tags; // comma-separated
+
+    private LocalDate publishDate;
+
+    @OneToMany(mappedBy = "microLesson")
+    private List<Progress> progresses;
 }

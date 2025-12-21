@@ -1,34 +1,52 @@
 package com.example.demo.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import java.time.LocalDateTime;
-
-@Entity
-@Table(name = "courses")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Course {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
     private String title;
-
     private String description;
-    private String category;
-    private LocalDateTime createdAt;
+    private Long instructorId; // added for linking to instructor
 
-    @ManyToOne
-    @JoinColumn(name = "instructor_id")
-    private User instructor;
+    // Constructors
+    public Course() {}
 
-    @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
+    public Course(Long id, String title, String description, Long instructorId) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.instructorId = instructorId;
+    }
+
+    // Getters & Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Long getInstructorId() {
+        return instructorId;
+    }
+
+    public void setInstructorId(Long instructorId) {
+        this.instructorId = instructorId;
     }
 }

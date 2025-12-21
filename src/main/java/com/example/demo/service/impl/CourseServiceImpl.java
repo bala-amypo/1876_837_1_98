@@ -1,64 +1,42 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.model.Course;
-import com.example.demo.model.User;
-import com.example.demo.repository.CourseRepository;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.service.CourseService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
-    private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
+    private final List<Course> courses = new ArrayList<>();
+    private Long nextId = 1L;
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
-        User instructor = userRepository.findById(instructorId)
-                .orElseThrow(() -> new IllegalArgumentException("Instructor not found"));
-
-        if (!("INSTRUCTOR".equalsIgnoreCase(instructor.getRole()) ||
-              "ADMIN".equalsIgnoreCase(instructor.getRole()))) {
-            throw new IllegalArgumentException("Only INSTRUCTOR or ADMIN can create courses");
-        }
-
-        if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
-            throw new IllegalArgumentException("Course title already exists for this instructor");
-        }
-
-        course.setInstructor(instructor);
-        return courseRepository.save(course);
+        course.setId(nextId++);
+        course.setInstructorId(instructorId); // set instructorId
+        courses.add(course);
+        return course;
     }
 
     @Override
-    public Course updateCourse(Long courseId, Course newCourse) {
-        Course existing = courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("Course not found"));
-
-        existing.setTitle(newCourse.getTitle());
-        existing.setDescription(newCourse.getDescription());
-        existing.setCategory(newCourse.getCategory());
-
-        return courseRepository.save(existing);
+    public List<Course> getAllCourses() {
+        return courses;
     }
 
     @Override
-    public List<Course> listCoursesByInstructor(Long instructorId) {
-        return courseRepository.findAll()
-                .stream()
-                .filter(c -> c.getInstructor() != null &&
-                             instructorId.equals(c.getInstructor().getId()))
-                .toList();
+    public Course getCourseById(Long id) {
+        Optional<Course> courseOpt = courses.stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst();
+        return courseOpt.orElse(null);
     }
 
     @Override
-    public Course getCourse(Long courseId) {
-        return courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalArgumentException("Course not found"));
+    public void deleteCourse(Long id) {
+        courses.removeIf(c -> c.getId().equals(id));
     }
 }

@@ -66,6 +66,6 @@ public class MicroLesson {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "microLesson", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Progress> progressList;
 }

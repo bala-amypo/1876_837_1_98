@@ -1,8 +1,46 @@
+// package com.example.demo.model;
+
+// import jakarta.persistence.*;
+// import lombok.*;
+// import java.time.LocalDateTime;
+// import java.util.List;
+
+// @Entity
+// @Table(name = "courses")
+// @Data
+// @NoArgsConstructor
+// @AllArgsConstructor
+// @Builder
+// public class Course {
+
+//     @Id
+//     @GeneratedValue(strategy = GenerationType.IDENTITY)
+//     private Long id;
+
+//     @Column(nullable = false)
+//     private String title;
+
+//     private String description;
+//     private String category;
+//     private LocalDateTime createdAt;
+
+//     @ManyToOne
+//     @JoinColumn(name = "instructor_id", nullable = false)
+//     private User instructor;
+
+//     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+//     private List<MicroLesson> lessons;
+
+//     @PrePersist
+//     public void prePersist() {
+//         this.createdAt = LocalDateTime.now();
+//     }
+// }
 package com.example.demo.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -17,22 +55,25 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String title;
 
     private String description;
+
     private String category;
-    private LocalDateTime createdAt;
+
+    private LocalDate createdAt;
 
     @ManyToOne
     @JoinColumn(name = "instructor_id", nullable = false)
     private User instructor;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MicroLesson> lessons;
 
     @PrePersist
     public void prePersist() {
-        this.createdAt = LocalDateTime.now();
+        if (createdAt == null) {
+            createdAt = LocalDate.now();
+        }
     }
 }

@@ -2,7 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Course;
 import com.example.demo.service.CourseService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -15,18 +17,25 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    @PostMapping("/create")
-    public Course createCourse(@RequestParam Long instructorId, @RequestBody Course course) {
-        return courseService.createCourse(course, instructorId);
+    // Create course with lessons
+    @PostMapping
+    public ResponseEntity<Course> createCourse(@RequestBody Course course, 
+                                               @RequestParam Long instructorId) {
+        Course created = courseService.createCourse(course, instructorId);
+        return ResponseEntity.ok(created);
     }
 
+    // Get all courses by instructor
+    @GetMapping("/instructor/{id}")
+    public ResponseEntity<List<Course>> getCoursesByInstructor(@PathVariable Long id) {
+        List<Course> courses = courseService.listCoursesByInstructor(id);
+        return ResponseEntity.ok(courses);
+    }
+
+    // Get course by id
     @GetMapping("/{id}")
-    public Course getCourse(@PathVariable Long id) {
-        return courseService.getCourse(id);
-    }
-
-    @GetMapping("/instructor/{instructorId}")
-    public List<Course> listCourses(@PathVariable Long instructorId) {
-        return courseService.listCoursesByInstructor(instructorId);
+    public ResponseEntity<Course> getCourse(@PathVariable Long id) {
+        Course course = courseService.getCourse(id);
+        return ResponseEntity.ok(course);
     }
 }

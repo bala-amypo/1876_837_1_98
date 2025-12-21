@@ -33,6 +33,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course createCourse(Course course, Long instructorId) {
+        // Check instructor exists
         User instructor = userRepository.findById(instructorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor not found"));
 
@@ -41,50 +42,30 @@ public class CourseServiceImpl implements CourseService {
             throw new ValidationException("User is not authorized to create courses");
         }
 
-        if (courseRepository.existsByTitleAndInstructorId(course.getTitle(), instructorId)) {
-            throw new ValidationException("Course title already exists for this instructor");
-        }
-
         course.setInstructor(instructor);
+
+        // First save course to generate ID
         Course created = courseRepository.save(course);
 
+        // Save lessons if any
         if (course.getLessons() != null && !course.getLessons().isEmpty()) {
             for (MicroLesson lesson : course.getLessons()) {
-                lesson.setCourse(created);
+                lesson.setCourse(created); // set course reference
 
-                if (lesson.getContentType() == null || lesson.getContentType().trim().isEmpty()) {
-                    lesson.setContentType("VIDEO");
-                }
-                if (lesson.getDifficulty() == null || lesson.getDifficulty().trim().isEmpty()) {
-                    lesson.setDifficulty("BEGINNER");
-                }
-                if (lesson.getTags() == null) lesson.setTags("");
+                // Defaults
+                if (lesson.getContentType() == null) lesson.setContentType("VIDEO");
+                if (lesson.getDifficulty() == null) lesson.setDifficulty("BEGINNER");
                 if (lesson.getPublishDate() == null) lesson.setPublishDate(LocalDate.now());
 
-                if (lesson.getTitle() == null || lesson.getTitle().trim().isEmpty()) {
-                    throw new ValidationException("Lesson title cannot be null or empty");
-                }
-                if (lesson.getDurationMinutes() == null || lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15) {
-                    throw new ValidationException("Lesson duration must be between 1 and 15 minutes");
-                }
+                if (lesson.getTitle() == null || lesson.getTitle().trim().isEmpty())
+                    throw new ValidationException("Lesson title cannot be empty");
+                if (lesson.getDurationMinutes() == null || lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15)
+                    throw new ValidationException("Lesson duration must be 1-15 minutes");
             }
-
             lessonRepository.saveAll(course.getLessons());
         }
 
         return created;
-    }
-
-    @Override
-    public Course updateCourse(Long courseId, Course updatedCourse) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
-
-        course.setTitle(updatedCourse.getTitle());
-        course.setDescription(updatedCourse.getDescription());
-        course.setCategory(updatedCourse.getCategory());
-
-        return courseRepository.save(course);
     }
 
     @Override

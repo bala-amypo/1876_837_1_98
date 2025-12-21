@@ -31,7 +31,14 @@ public class User {
 
     private String preferredLearningStyle;
 
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // ✅ AUTO SET createdAt
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
     private List<Course> courses;

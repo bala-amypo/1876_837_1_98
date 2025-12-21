@@ -4,22 +4,48 @@ import com.example.demo.model.Course;
 import com.example.demo.model.MicroLesson;
 import com.example.demo.model.User;
 import com.example.demo.repository.CourseRepository;
+import com.example.demo.repository.MicroLessonRepository;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.CourseService;
 import org.springframework.stereotype.Service;
 
-@Service
-public class CourseServiceImpl {
+@Service   // 🔥 THIS WAS MISSING OR WRONG
+public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
+    private final MicroLessonRepository microLessonRepository;
 
-    public CourseServiceImpl(CourseRepository courseRepository) {
+    public CourseServiceImpl(
+            CourseRepository courseRepository,
+            UserRepository userRepository,
+            MicroLessonRepository microLessonRepository) {
+
         this.courseRepository = courseRepository;
+        this.userRepository = userRepository;
+        this.microLessonRepository = microLessonRepository;
     }
 
-    public Course createCourse(Course course, User instructor) {
+    @Override
+    public Course createCourse(Course course, Long instructorId) {
+
+        User instructor = userRepository.findById(instructorId)
+                .orElseThrow(() -> new RuntimeException("Instructor not found"));
+
         if (!"INSTRUCTOR".equals(instructor.getRole())) {
-            throw new RuntimeException("Only instructors can create courses");
+            throw new RuntimeException("User is not an instructor");
         }
+
         course.setInstructor(instructor);
-        return courseRepository.save(course);
+        Course savedCourse = courseRepository.save(course);
+
+        if (course.getLessons() != null) {
+            for (MicroLesson lesson : course.getLessons()) {
+                lesson.setCourse(savedCourse);
+                microLessonRepository.save(lesson);
+            }
+        }
+
+        return savedCourse;
     }
 }

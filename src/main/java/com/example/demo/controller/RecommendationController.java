@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.MicroLesson;
 import com.example.demo.service.RecommendationService;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,20 +9,21 @@ import java.util.List;
 @RequestMapping("/recommendations")
 public class RecommendationController {
 
-    private final RecommendationService recommendationService;
+    private final RecommendationService service;
 
-    public RecommendationController(RecommendationService recommendationService) {
-        this.recommendationService = recommendationService;
+    public RecommendationController(RecommendationService service) {
+        this.service = service;
     }
 
-    @GetMapping
-    public List<MicroLesson> getRecommendations(
-            @RequestParam Long userId,
-            @RequestParam String difficulty,
-            @RequestParam String contentType
-    ) {
-        return recommendationService.recommendLessons(
-                userId, difficulty, contentType
-        );
+    // ✅ POST – generate recommendation
+    @PostMapping("/generate")
+    public List<String> generate() {
+        return service.generate();
+    }
+
+    // ✅ GET – latest recommendation
+    @GetMapping("/latest")
+    public List<String> latest() {
+        return service.generate();
     }
 }

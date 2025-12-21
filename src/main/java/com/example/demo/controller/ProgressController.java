@@ -2,38 +2,31 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Progress;
 import com.example.demo.service.ProgressService;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @RestController
 @RequestMapping("/progress")
-@Tag(name = "Progress Tracking", description = "APIs for tracking learner progress")
 public class ProgressController {
 
-    private final ProgressService progressService;
+    private final ProgressService service;
 
-    public ProgressController(ProgressService progressService) {
-        this.progressService = progressService;
+    public ProgressController(ProgressService service) {
+        this.service = service;
     }
 
+    // ✅ POST – record or update progress
     @PostMapping("/{lessonId}")
-    public ResponseEntity<Progress> recordProgress(@RequestParam Long userId,
-                                                   @PathVariable Long lessonId,
-                                                   @RequestBody Progress progress) {
-        Progress saved = progressService.recordProgress(userId, lessonId, progress);
-        return ResponseEntity.ok(saved);
+    public Progress saveProgress(
+            @PathVariable Long lessonId,
+            @RequestBody Progress progress) {
+        return service.saveProgress(lessonId, progress);
     }
 
-    @GetMapping("/lesson/{lessonId}")
-    public ResponseEntity<Progress> getProgress(@RequestParam Long userId,
-                                                @PathVariable Long lessonId) {
-        return ResponseEntity.ok(progressService.getProgress(userId, lessonId));
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Progress>> getUserProgress(@PathVariable Long userId) {
-        return ResponseEntity.ok(progressService.getUserProgress(userId));
+    // ✅ GET – get user progress for lesson
+    @GetMapping("/lesson/{lessonId}/user/{userId}")
+    public Progress getProgress(
+            @PathVariable Long lessonId,
+            @PathVariable Long userId) {
+        return service.getProgress(lessonId, userId);
     }
 }

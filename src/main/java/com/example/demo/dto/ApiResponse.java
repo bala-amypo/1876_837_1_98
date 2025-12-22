@@ -11,5 +11,5 @@ public class ApiResponse<T> {
 
     private boolean success;
     private String message;
-    private T data;  // can hold any type (User, Course, Lesson, etc.)
+    private T data;  //  (User, Course, Lesson, etc.)
 }

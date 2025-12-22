@@ -19,7 +19,7 @@ public class ProgressController {
         this.progressService = progressService;
     }
 
-    // ✅ Record progress for a user on a specific lesson
+    //  Record progress for a user on a specific lesson
     @PostMapping("/{lessonId}")
     public ResponseEntity<Progress> recordProgress(@PathVariable Long lessonId,
                                                    @RequestBody Progress progress) {
@@ -27,13 +27,13 @@ public class ProgressController {
         return ResponseEntity.ok(created);
     }
 
-    // ✅ Get progress by user ID
+    //  Get progress by user ID
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Progress>> getProgressByUser(@PathVariable Long userId) {
         return ResponseEntity.ok(progressService.getProgressByUser(userId));
     }
 
-    // ✅ Get progress by lesson ID
+    //  Get progress by lesson ID
     @GetMapping("/lesson/{lessonId}")
     public ResponseEntity<List<Progress>> getProgressByLesson(@PathVariable Long lessonId) {
         return ResponseEntity.ok(progressService.getProgressByLesson(lessonId));

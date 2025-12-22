@@ -19,7 +19,7 @@ public class RecommendationController {
         this.service = service;
     }
 
-    // ✅ Generate a recommendation
+    //  Generate a recommendation
     @PostMapping("/generate")
     public ResponseEntity<Recommendation> generateRecommendation(
             @RequestParam Long userId,
@@ -30,13 +30,13 @@ public class RecommendationController {
         return ResponseEntity.ok(created);
     }
 
-    // ✅ Get latest recommendation for user
+    //  Get latest recommendation for user
     @GetMapping("/latest")
     public ResponseEntity<Recommendation> getLatest(@RequestParam Long userId) {
         return ResponseEntity.ok(service.getLatest(userId));
     }
 
-    // ✅ Get all recommendations for a user
+    //  Get all recommendations for a user
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Recommendation>> getUserRecommendations(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getByUser(userId));

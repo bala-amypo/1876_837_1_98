@@ -78,7 +78,7 @@
 //         return lessonRepository.findById(lessonId)
 //                 .orElseThrow(() -> new ResourceNotFoundException("Lesson not found"));
 //     }
-// }
+// // }
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.ResourceNotFoundException;
@@ -109,8 +109,12 @@ public class LessonServiceImpl implements LessonService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
         
-        if (lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15) {
+        if (lesson.getDurationMinutes() == null || lesson.getDurationMinutes() <= 0 || lesson.getDurationMinutes() > 15) {
             throw new IllegalArgumentException("Duration must be between 1 and 15 minutes");
+        }
+        
+        if (lesson.getPublishDate() == null) {
+            lesson.setPublishDate(java.time.LocalDate.now());
         }
         
         lesson.setCourse(course);

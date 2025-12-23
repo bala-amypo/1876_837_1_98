@@ -84,8 +84,55 @@
 //         this.lessons = lessons;
 //     }
 // }
+// NEW
+// package com.example.demo.model;
+
+// import jakarta.persistence.*;
+// import jakarta.validation.constraints.NotBlank;
+// import jakarta.validation.constraints.Size;
+// import lombok.AllArgsConstructor;
+// import lombok.Builder;
+// import lombok.Data;
+// import lombok.NoArgsConstructor;
+
+// import java.time.LocalDateTime;
+
+// @Entity
+// @Table(name = "courses")
+// @Data
+// @Builder
+// @NoArgsConstructor
+// @AllArgsConstructor
+// public class Course {
+//     @Id
+//     @GeneratedValue(strategy = GenerationType.IDENTITY)
+//     private Long id;
+
+//     @NotBlank
+//     @Size(max = 150)
+//     private String title;
+
+//     @Size(max = 500)
+//     private String description;
+
+//     @ManyToOne(fetch = FetchType.LAZY)
+//     @JoinColumn(name = "instructor_id", nullable = false)
+//     private User instructor;
+
+//     @NotBlank
+//     @Size(max = 50)
+//     private String category;
+
+//     private LocalDateTime createdAt;
+
+//     @PrePersist
+//     protected void onCreate() {
+//         this.createdAt = LocalDateTime.now();
+//     }
+// }
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -102,6 +149,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -114,8 +162,9 @@ public class Course {
     @Size(max = 500)
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "instructor_id", nullable = false)
+    @JsonIgnoreProperties({"password", "createdAt"})
     private User instructor;
 
     @NotBlank

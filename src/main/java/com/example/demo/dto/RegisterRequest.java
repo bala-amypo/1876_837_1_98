@@ -1,22 +1,22 @@
-package com.example.demo.dto;
+// package com.example.demo.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+// import jakarta.validation.constraints.Email;
+// import jakarta.validation.constraints.NotBlank;
+// import lombok.Data;
 
-@Data
-public class RegisterRequest {
+// @Data
+// public class RegisterRequest {
 
-    @NotBlank
-    private String fullName;
+//     @NotBlank
+//     private String fullName;
 
-    @Email
-    @NotBlank
-    private String email;
+//     @Email
+//     @NotBlank
+//     private String email;
 
-    @NotBlank
-    private String password;
+//     @NotBlank
+//     private String password;
 
-    private String role; // Optional, default: LEARNER
-    private String preferredLearningStyle; // Optional
-}
+//     private String role; // Optional, default: LEARNER
+//     private String preferredLearningStyle; // Optional
+// }

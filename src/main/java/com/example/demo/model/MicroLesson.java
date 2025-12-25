@@ -1,22 +1,15 @@
 package com.example.demo.model;
-
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "micro_lessons")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity @Table(name = "micro_lessons")
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class MicroLesson {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course; // This provides setCourse()
+    @ManyToOne @JoinColumn(name = "course_id")
+    private Course course; // This is the field LessonServiceImpl uses setCourse() on
 
     private String title;
     private Integer durationMinutes;

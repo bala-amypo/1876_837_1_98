@@ -20,6 +20,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
+        // Calls the register(User) method in service
         return ResponseEntity.ok(userService.register(user));
     }
 
@@ -27,6 +28,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
+        // Calls the login(String, String) method in service
         return ResponseEntity.ok(userService.login(email, password));
     }
 }

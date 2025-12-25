@@ -1,7 +1,11 @@
 package com.example.demo.dto;
+
 import lombok.*;
 
-@Data @Builder @AllArgsConstructor @NoArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AuthResponse {
     private String accessToken;
     private Long userId;

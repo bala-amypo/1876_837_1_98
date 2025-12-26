@@ -1,3 +1,41 @@
+// package com.example.demo.config;
+
+// import com.example.demo.security.JwtFilter;
+// import org.springframework.context.annotation.Bean;
+// import org.springframework.context.annotation.Configuration;
+// import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+// import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Add this import
+// import org.springframework.security.web.SecurityFilterChain;
+// import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+// @Configuration
+// @EnableWebSecurity
+// public class SecurityConfig {
+
+//     private final JwtFilter jwtFilter;
+
+//     public SecurityConfig(JwtFilter jwtFilter) {
+//         this.jwtFilter = jwtFilter;
+//     }
+
+//     // ADD THIS BEAN HERE
+//     @Bean
+//     public BCryptPasswordEncoder passwordEncoder() {
+//         return new BCryptPasswordEncoder();
+//     }
+
+//     @Bean
+//     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//         http.csrf(csrf -> csrf.disable())
+//             .authorizeHttpRequests(auth -> auth
+//                 .requestMatchers("/auth/**", "/status-servlet", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+//                 .anyRequest().authenticated()
+//             )
+//             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+//         return http.build();
+//     }
+// }
 package com.example.demo.config;
 
 import com.example.demo.security.JwtFilter;
@@ -5,7 +43,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; // Add this import
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -19,7 +58,6 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
-    // ADD THIS BEAN HERE
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -27,12 +65,18 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**", "/status-servlet", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/status-servlet").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest().authenticated()
-            )
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            );
+
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        
         return http.build();
     }
 }

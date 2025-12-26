@@ -31,29 +31,16 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "users")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Entity @Table(name = "users")
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String fullName;
-
-    @Column(unique = true)
     private String email;
-
     private String password;
-
-    private String role; // LEARNER, INSTRUCTOR, ADMIN
-
+    private String role;
     private String preferredLearningStyle;
-
     private LocalDateTime createdAt;
 
     @PrePersist

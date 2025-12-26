@@ -82,7 +82,7 @@ public class SwaggerConfig {
                 
                 // 2. Add the Servers (Deployment URL and Localhost)
                 .servers(List.of(
-                        new Server().url("https://9114.pro604cr.amypo.ai/").description("Remote Server"),
+                        new Server().url("https://9203.408procr.amypo.ai/").description("Remote Server"),
                         new Server().url("http://localhost:9001").description("Local Server")
                 ))
 

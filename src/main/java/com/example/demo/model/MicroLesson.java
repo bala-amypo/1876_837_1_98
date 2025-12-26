@@ -39,6 +39,42 @@
 //     private String tags;
 // }
 
+
+
+
+// plz one change
+// package com.example.demo.model;
+
+// import jakarta.persistence.*;
+// import lombok.*;
+// import java.time.LocalDate;
+
+// @Entity 
+// @Table(name = "micro_lessons") // Explicitly plural
+// @Data 
+// @Builder 
+// @NoArgsConstructor 
+// @AllArgsConstructor
+// public class MicroLesson {
+//     @Id 
+//     @GeneratedValue(strategy = GenerationType.IDENTITY)
+//     private Long id;
+
+//     // This JoinColumn maps to the 'id' in the 'courses' table
+//     @ManyToOne
+//     @JoinColumn(name = "course_id", nullable = false) 
+//     private Course course;
+
+//     @Column(nullable = false)
+//     private String title;
+
+//     private Integer durationMinutes;
+//     private String contentType; // e.g., VIDEO, TEXT
+//     private String difficulty;  // e.g., BEGINNER, INTERMEDIATE
+//     private String tags;        // comma-separated
+//     private LocalDate publishDate;
+// }
+
 package com.example.demo.model;
 
 import jakarta.persistence.*;
@@ -46,27 +82,21 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity 
-@Table(name = "micro_lessons") // Explicitly plural
-@Data 
-@Builder 
-@NoArgsConstructor 
-@AllArgsConstructor
+@Table(name = "course_lessons") // CHANGE THIS NAME ONLY
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class MicroLesson {
-    @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // This JoinColumn maps to the 'id' in the 'courses' table
+    // This ensures it links to the 'courses' table from your screenshot
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false) 
     private Course course;
 
-    @Column(nullable = false)
     private String title;
-
     private Integer durationMinutes;
-    private String contentType; // e.g., VIDEO, TEXT
-    private String difficulty;  // e.g., BEGINNER, INTERMEDIATE
-    private String tags;        // comma-separated
+    private String contentType; 
+    private String difficulty;  
+    private String tags;        
     private LocalDate publishDate;
 }

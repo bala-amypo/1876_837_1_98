@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity 
-@Table(name = "user_recommendations") // Renamed to avoid DB ghost constraints
+@Table(name = "user_recommendations") 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class Recommendation {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity 
-@Table(name = "course_lessons") // CHANGE THIS NAME ONLY
+@Table(name = "course_lessons") 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class MicroLesson {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

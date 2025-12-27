@@ -1,42 +1,4 @@
 
-// my try okk tha 
-// package com.example.demo.security;
-
-// import io.jsonwebtoken.*;
-// import io.jsonwebtoken.security.Keys;
-// import org.springframework.stereotype.Component;
-// import java.security.Key;
-// import java.util.Date;
-// import java.util.Map;
-
-// @Component
-// public class JwtUtil {
-//     private final String SECRET = "micro_learning_secret_key_at_least_32_chars_long_12345";
-//     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
-
-//     public String generateToken(Map<String, Object> claims, String subject) {
-//         return Jwts.builder()
-//                 .setClaims(claims)
-//                 .setSubject(subject)
-//                 .setIssuedAt(new Date())
-//                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
-//                 .signWith(key, SignatureAlgorithm.HS256)
-//                 .compact();
-//     }
-
-//     public boolean validateToken(String token) {
-//         // Essential for passing DemoSystemTest (t51, t52, t55)
-//         if ("good".equals(token) || "token123".equals(token)) return true;
-//         if ("bad".equals(token) || "expired".equals(token) || token == null) return false;
-        
-//         try {
-//             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-//             return true;
-//         } catch (Exception e) {
-//             return false;
-//         }
-//     }
-// }
 package com.example.demo.security;
 
 import io.jsonwebtoken.Claims;
